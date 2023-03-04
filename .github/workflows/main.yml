@@ -22,3 +22,6 @@ jobs:
       - name: Deploy to Elastic Beanstalk
         run: |
           eb deploy
+      - name: Success
+        run: |
+          echo "Success"
