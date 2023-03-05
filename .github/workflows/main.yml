@@ -5,14 +5,47 @@ on:
     branches: [ master ]
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
 
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v1
+        with:
+          python-version: "3.9"
+
+      - name: Install dependencies
+        run: 
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run unit tests
+        run: 
+          python test_application.py
+          
+  deploy:
+    needs:
+      - build
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v1
+        with:
+          python-version: "3.9"
+
       - name: Create ZIP deployment package
         run: zip -r deploy_package.zip ./
+      
+      - name: Get EB CLI version
+        run: |
+          python -m pip install --upgrade pip
+          pip install awsebcli --upgrade
+          eb --version
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
